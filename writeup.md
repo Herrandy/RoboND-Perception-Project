@@ -12,7 +12,7 @@
 
 ### Exercise 1
 
-Remove pepper noise from the cloud 
+First we remove pepper noise from the cloud 
 ```python
 outlier_filter = pcl_data.make_statistical_outlier_filter()
 k = 20
@@ -21,9 +21,9 @@ x = 0.3
 outlier_filter.set_std_dev_mul_thresh(x)
 cloud_denoised = outlier_filter.filter()
 ```
-where k is the number of neighbouring points used in the filtering and x is the standard deviation threshold.
+where k is the number of neighbouring points used in the filtering process and x is the standard deviation threshold.
 
-Downsampling cloud using leafsize 0.005
+Then downsampling the cloud using a leafsize 0.005
 ```python
 vox = cloud_denoised.make_voxel_grid_filter()
 LEAF_SIZE = 0.005
@@ -40,11 +40,11 @@ axis_max = 1.1
 passthrough.set_filter_limits(axis_min, axis_max)
 cloud_filtered = passthrough.filter()
 ```
-The function was called using z and y for the variable AXIS so that we were only left with the table and objects.
+The function was used using z and y for the variable AXIS so that we were only left with the table and objects.
 
 
-Finally the filtered cloud was segmented using RANSAC plane fitting into two different set of points extracted_inliers and extracted_outliers which contained the table and the objects respectively.
-In the function max_distance was set so that the front of the table was also correctly segmented into inliers.
+Finally the filtered cloud was segmented using RANSAC plane fitting algorithm into two different set of points named extracted_inliers and extracted_outliers which contained the table and the objects respectively.
+In the function max_distance was set so that the front of the table (vertical plane w.r.t camera) was also correctly segmented into inliers.
 ```python
 seg = cloud_filtered.make_segmenter()
 seg.set_model_type(pcl.SACMODEL_PLANE)
@@ -73,14 +73,14 @@ ec.set_SearchMethod(tree)
 Minimum and maximum number of points in a cluster was set to 30 and 2000. Maximum distance between neighbouring points in a cluster was set to 0.05. 
 
 ### Exercise 3
-Training of the SVM done running the following commands:
+Training of the SVM was done running the following commands:
 
 ```bash
 $ roslaunch sensor_stick training.launch # build-up the environment
 $ rosrun sensor_stick capture_features.py # generate test data
 $ rosrun sensor_stick train_svm.py # train svm
 ```
-In the training process each object was rotated to random pose 100 times. The SVM was trained using normals and HSV color features.
+In the training process each object was rotated to random pose 100 times. The SVM was trained using point normals and HSV color features.
 Below are images of the normalized confusion matrices obtained after training:
 ![alt text][image1] ![alt text][image2] ![alt text][image3] 
 
@@ -91,7 +91,7 @@ The Pick and Place system was run in three different configurations by runnig th
 $ roslaunch pr2_robot pick_place_project.launch # summons the environment
 $ rosrun pr2_robot project_node.py # starts the recognition pipeline
 ```
-The file project_node.py contains the perception functionality which was implemented in Exercises 1,2 and 3. In additions to perception 
+The file project_node.py contains the perception functionality which was mainly copied from Exercises 1, 2 and 3. In additions to perception pipeline
 the file contains code for generating request messages for pick_and_place_server based on the output of the perception. The request was formed as a .yaml file.     
 The output yaml files can be found from the root directory of RoboND-Perception-Project. 
 
@@ -101,11 +101,11 @@ Below are visualized the result of recognition pipleline.
 
 In world 1 all the object were recognized successfully (3/3). 
 In world 2 all the objects were classified correctly except the glue which was given the label soap. This is odd because 
-if we look at the confusion matrix for the world 2 we can see that in the training process there was zero confusion between the soap
+if we look at the confusion matrix of the world 2 we can see that in the training process there was zero confusion between the soap
 and the glue. Again in the world 3 all the objects one is classified correctly. Again the glue is incorretly classified but this into biscuits.
 
 Overall the results are OK and meet the requirements of the project. To improve the results we could increase the number of training 
-examples and also evaluate different kernels for the SVM. In the current implementation I am using the default kernel (linear) and it would be interesting 
+examples and also evaluate the system using different kernels for the SVM. In the current implementation I am using the default kernel (linear) and it would be interesting 
 to test for instance the RBF kernel. In the future I am also planning to finish the optional parts of the project.
 
 
